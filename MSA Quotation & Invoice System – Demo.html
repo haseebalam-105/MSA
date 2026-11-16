@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MSA Quotation & Invoice System – Demo</title>
+<style>
+:root{--bg:#f3f5f9;--surface:#fff;--ink:#1c2233;--muted:#667089;--line:#dfe3ec;--brand:#2b4a9b;--brand-ink:#fff;--side:#18244d;--ok:#12805c;--okbg:#dff3ea;--warn:#9a6200;--warnbg:#fdf0d5;--bad:#b3261e;--badbg:#fbe1de;--info:#2b4a9b;--infobg:#e3e9f8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111522;--surface:#1a2033;--ink:#e8ebf4;--muted:#99a2bb;--line:#2c3550;--brand:#6f8fe8;--brand-ink:#0f1630;--side:#0c1020;--ok:#5fd0a2;--okbg:#14382c;--warn:#f0bf62;--warnbg:#3b2d10;--bad:#f28b82;--badbg:#401a17;--info:#9db4f2;--infobg:#202a4d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111522;--surface:#1a2033;--ink:#e8ebf4;--muted:#99a2bb;--line:#2c3550;--brand:#6f8fe8;--brand-ink:#0f1630;--side:#0c1020;--ok:#5fd0a2;--okbg:#14382c;--warn:#f0bf62;--warnbg:#3b2d10;--bad:#f28b82;--badbg:#401a17;--info:#9db4f2;--infobg:#202a4d;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);height:100vh;overflow:hidden}
+aside{background:var(--side);color:#dfe5f7;padding:20px 12px;height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.logo{display:flex;align-items:center;gap:10px;padding:0 8px 18px;font-weight:700;font-size:17px;color:#fff}
+.logo b{background:#fff;color:#2b4a9b;border-radius:6px;padding:2px 7px;font-size:15px}
+.logo small{display:block;font-weight:400;font-size:11px;color:#9fb0e0}
+nav button{all:unset;display:flex;width:100%;gap:10px;align-items:center;padding:9px 12px;border-radius:8px;cursor:pointer;color:#c5cfee;box-sizing:border-box}
+nav button:hover{background:rgba(255,255,255,.08)}nav button.on{background:#fff;color:#18244d;font-weight:600}
+nav button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #6f8fe8;outline-offset:2px}
+.who{margin-top:auto;font-size:12px;color:#9fb0e0;padding:8px}
+main{padding:26px 30px;width:100%;min-width:0;height:100%;overflow:auto}
+h1{font-size:24px;margin:0 0 2px}.sub{color:var(--muted);margin:0 0 20px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.btn{all:unset;cursor:pointer;background:var(--brand);color:var(--brand-ink);padding:8px 14px;border-radius:8px;font-weight:600;font-size:14px;box-sizing:border-box}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:4px 10px;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.stat .n{font-size:26px;font-weight:700;letter-spacing:-.5px}.stat .l{color:var(--muted);font-size:13px}
+.stat.hot .n{color:var(--bad)}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+.card h2{font-size:16px;margin:0 0 12px}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--line);white-space:normal}td:first-child,td.r,td:last-child{white-space:nowrap}tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12.5px;font-weight:600}
+.Paid,.Approved{background:var(--okbg);color:var(--ok)}.Pending,.Sent{background:var(--warnbg);color:var(--warn)}
+.Overdue,.Rejected{background:var(--badbg);color:var(--bad)}.Draft{background:var(--infobg);color:var(--info)}
+.Void{background:var(--line);color:var(--muted)}
+select.pill{border:0;padding:3px 8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:8px}
+.bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;font-size:12px;color:var(--muted)}
+.bars i{display:block;width:100%;background:var(--brand);border-radius:6px 6px 0 0;min-height:4px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+input,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+.editor{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:14px;align-items:start}
+.form label{display:block;font-size:13px;color:var(--muted);margin:10px 0 3px}.form input,.form select{width:100%}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink)!important;margin:6px 0!important}.chk input{width:auto}
+.doc{background:#fff;color:#111;border:1px solid #cfd5e3;border-radius:6px;padding:22px;font-size:13px;line-height:1.45;color-scheme:light}
+.doc .hd{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.doc .lg{font-weight:800;font-size:30px;color:#2b4a9b;line-height:1}.doc .lg small{display:block;font-size:9px;letter-spacing:3px;font-weight:500}
+.doc .meta{text-align:right;font-size:12px}
+.doc h3{margin:16px 0 6px;font-size:16px;background:#e6efe0;padding:6px 10px;text-align:center}
+.doc table{font-size:12.5px}.doc th{background:#fbd5a8;color:#111;border:1px solid #999;padding:5px 7px}.doc td{border:1px solid #999;padding:5px 7px;white-space:normal}
+.doc .tot td{font-weight:700}.doc .gr td{background:#00b050;color:#000}
+.doc .bank{margin-top:12px;font-size:11.5px;color:#333}
+.stamp{display:inline-block;margin-top:10px;border:2px solid #2b4a9b;color:#2b4a9b;border-radius:50%;width:70px;height:70px;font-size:8px;text-align:center;padding-top:24px;transform:rotate(-12deg)}
+.note{background:var(--infobg);color:var(--info);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13.5px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1;pointer-events:auto}
+@media (max-width:860px){.app{grid-template-columns:1fr;height:auto;overflow:visible}main{height:auto;overflow:visible}aside{position:static;height:auto;overflow:visible;flex-direction:row;flex-wrap:wrap;padding:10px}.logo{width:100%;padding-bottom:6px}nav{display:flex;flex-wrap:wrap;gap:4px}nav button{width:auto}.who{display:none}main{padding:18px 14px}.grid2,.editor{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+ <div class="logo"><b>MSA</b><span>Telecommunication<small>Quotes & Invoices</small></span></div>
+ <nav id="nav"></nav>
+ <div class="who" id="who"></div>
+</aside>
+<main id="main"></main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const K=n=>'K'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const customers=[
+ {n:'Digitec Communications',c:'Mr. Justine Prakash',q:2,i:1},{n:'Vodafone PNG',c:'Procurement',q:3,i:2},{n:'Digicel PNG',c:'Site Operations',q:4,i:3},
+ {n:'AVIAT',c:'Field Services',q:1,i:1},{n:'ZTE',c:'Project Team',q:2,i:1},{n:'HUAWEI',c:'Project Team',q:2,i:2},{n:'Kacific',c:'Network Ops',q:1,i:0},{n:'Telikom PNG',c:'Procurement',q:2,i:1}];
+let quotes=[
+ {no:'VF-O&M20260902',cu:'Digitec Communications',site:'VP0549',t:'Secure site VP0549',d:'07-Sep-26',amt:8800,st:'Sent'},
+ {no:'VF-O&M20260901',cu:'Vodafone PNG',site:'VP0112',t:'Tower lighting repair',d:'03-Sep-26',amt:4400,st:'Approved'},
+ {no:'VF-O&M20260899',cu:'Digicel PNG',site:'DG0231',t:'Generator service',d:'29-Aug-26',amt:12650,st:'Draft'},
+ {no:'VF-O&M20260897',cu:'Kacific',site:'KC0017',t:'Site cleaning & access',d:'24-Aug-26',amt:3300,st:'Rejected'}];
+let invoices=[
+ {no:'VF-0729',cu:'Digitec Communications',site:'VP0009',t:'Aug-26 O&M VP0009 Vandalized Site Restoration',d:'01-Sep-26',amt:6391,st:'Pending'},
+ {no:'VF-0725',cu:'Vodafone PNG',site:'VP0074',t:'Aug-26 O&M fence repair',d:'20-Aug-26',amt:9240,st:'Paid'},
+ {no:'VF-0721',cu:'Digicel PNG',site:'DG0102',t:'Jul-26 O&M site restoration',d:'28-Jul-26',amt:15400,st:'Overdue'},
+ {no:'VF-0718',cu:'Telikom PNG',site:'TK0044',t:'Jul-26 O&M battery replacement',d:'15-Jul-26',amt:7150,st:'Paid'}];
+const pages={dash:'Dashboard',quotes:'Quotations',edit:'New quotation',inv:'Invoices',cust:'Customers'};
+let page='dash',f={q:'',s:'All'};
+let ed={cu:'Digitec Communications',site:'VP0549',t:'Secure site VP0549',gst:10,showSite:true,
+ items:[['Supply and fix razor wire and barbed wire for the damaged parts',1,1000],['Secure all the fence with V-crimp fencing sheets with its accessories (44 m)',1,7000]]};
+let tt;function toast(m,fn){const t=document.getElementById('toast');t.textContent=m+' ';if(fn){const b=document.createElement('button');b.textContent='Undo';b.style.cssText='all:unset;cursor:pointer;font-weight:700;text-decoration:underline;margin-left:8px';b.onclick=()=>{t.classList.remove('on');fn()};t.append(b)}t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),fn?7000:2200)}
+function go(p){page=p;render();scrollTo(0,0)}
+function pill(s){return `<span class="pill ${s}">${s}</span>`}
+function nav(){document.getElementById('nav').innerHTML=[['dash','Dashboard'],['quotes','Quotations'],['inv','Invoices'],['cust','Customers'],['logs','Activity log'],['set','Settings']].map(([k,l])=>`<button class="${page===k||(k==='quotes'&&page==='edit')?'on':''}" onclick="go('${k}')">${l}</button>`).join('')}
+function dash(){
+ const paid=invoices.filter(i=>i.st==='Paid').reduce((a,b)=>a+b.amt,0),pend=invoices.filter(i=>i.st==='Pending').reduce((a,b)=>a+b.amt,0),over=invoices.filter(i=>i.st==='Overdue').reduce((a,b)=>a+b.amt,0);
+ const m=[['Apr',22],['May',31],['Jun',18],['Jul',26],['Aug',34],['Sep',16]];
+ return `<div class="top"><div><h1>Dashboard</h1><p class="sub">Quotations, invoices and payments in one place.</p></div><button class="btn" onclick="go('edit')">New quotation</button></div>
+ <div class="note">This is a demo with sample data. Your real customers, sites and amounts will appear here.</div>
+ <div class="stats"><div class="card stat"><div class="n">${K(paid)}</div><div class="l">Paid this quarter</div></div>
+ <div class="card stat"><div class="n">${K(pend)}</div><div class="l">Pending payment</div></div>
+ <div class="card stat hot"><div class="n">${K(over)}</div><div class="l">Overdue</div></div>
+ <div class="card stat"><div class="n">${quotes.filter(q=>q.st==='Sent'||q.st==='Draft').length}</div><div class="l">Open quotations</div></div></div>
+ <div class="grid2"><div class="card"><h2>Revenue by month (K thousand)</h2><div class="bars">${m.map(([a,b])=>`<div>${b}<i style="height:${b*3.8}px"></i>${a}</div>`).join('')}</div></div>
+ <div class="card"><h2>Needs attention</h2><div class="wrap"><table>${invoices.filter(i=>i.st!=='Paid'&&i.st!=='Void').map(i=>`<tr><td>${i.no}<br><span class="sub" style="margin:0;font-size:12px">${i.cu}</span></td><td class="r">${K(i.amt)}<br>${pill(i.st)}</td></tr>`).join('')}</table></div></div></div>`}
+function list(kind){
+ const src=kind==='q'?quotes:invoices,sts=kind==='q'?['All','Draft','Sent','Approved','Rejected']:['All','Pending','Paid','Overdue','Void'];
+ const rows=src.filter(r=>(f.s==='All'||r.st===f.s)&&(r.no+r.cu+r.site+r.t).toLowerCase().includes(f.q.toLowerCase()));
+ return `<div class="top"><div><h1>${kind==='q'?'Quotations':'Invoices'}</h1><p class="sub">${kind==='q'?'Change a status from the dropdown in the Status column. Approved quotes can be converted into invoices.':'Wrong status? Change it from the dropdown, or choose Undo right after. Void cancels an invoice without deleting it.'}</p></div>
+ <div class="tools"><button class="btn alt" onclick="toast('Exported ${kind==='q'?'quotations':'invoices'}.xlsx')">Export Excel</button><button class="btn alt" onclick="toast('Exported ${kind==='q'?'quotations':'invoices'}.csv')">Export CSV</button>${kind==='q'?'<button class="btn" onclick="go(\'edit\')">New quotation</button>':''}</div></div>
+ <div class="tools"><input placeholder="Search number, customer or site" value="${f.q}" oninput="f.q=this.value;rerenderList('${kind}')" aria-label="Search"><select onchange="f.s=this.value;render()" aria-label="Status">${sts.map(s=>`<option ${f.s===s?'selected':''}>${s}</option>`).join('')}</select></div>
+ <div class="card wrap"><table><tr><th>Number</th><th>Customer</th><th>Site</th><th>Description</th><th>Date</th><th class="r">Total (incl. GST)</th><th>Status</th><th>Actions</th></tr>
+ ${rows.map((r,i)=>`<tr><td><strong>${r.no}</strong></td><td>${r.cu}</td><td>${r.site}</td><td>${r.t}</td><td>${r.d}</td><td class="r">${K(r.amt)}</td><td>${kind==='q'?stSel(r):iSel(r)}</td>
+ <td><button class="btn alt sm" onclick="toast('Downloading ${r.no}.pdf')">PDF</button> ${kind==='q'?(r.st==='Approved'?`<button class="btn sm" onclick="convert('${r.no}')">Convert to invoice</button>`:`<button class="btn alt sm" onclick="toast('Duplicated ${r.no}')">Duplicate</button>`):(r.st==='Pending'||r.st==='Overdue'?`<button class="btn sm" onclick="pay('${r.no}')">Mark paid</button>`:'')}</td></tr>`).join('')||'<tr><td colspan="8">No records match. Try a different search or status.</td></tr>'}</table></div>`}
+function rerenderList(k){const v=document.activeElement;render();const i=document.querySelector('input[aria-label=Search]');if(i){i.focus();i.setSelectionRange(f.q.length,f.q.length)}}
+function convert(no){const q=quotes.find(x=>x.no===no);invoices.unshift({no:'VF-0'+(730+invoices.length-3),cu:q.cu,site:q.site,t:q.t,d:'16-Nov-26',amt:q.amt,st:'Pending'});const inv=invoices[0];log('Converted quotation to invoice',no);f.s='All';go('inv');toast('Invoice '+inv.no+' created from '+no+'.',()=>{invoices.splice(invoices.indexOf(inv),1);log('Undid conversion: removed invoice '+inv.no,no);render()})}
+function pay(no){setInv(no,'Paid')}
+function setInv(no,s){const i=invoices.find(x=>x.no===no),o=i.st;i.st=s;log('Changed invoice status from '+o+' to '+s,no);render();toast(no+' is now '+s+'.',()=>{i.st=o;log('Undid status change on '+no+' (back to '+o+')',no);render()})}
+function iSel(r){return `<select class="pill ${r.st}" onchange="setInv('${r.no}',this.value)" aria-label="Status of ${r.no}">${['Pending','Paid','Overdue','Void'].map(s=>`<option ${s===r.st?'selected':''}>${s}</option>`).join('')}</select>`}
+let me=0,theme='system',lg='All',lstep=0;
+const users=[{n:'Mohy Aly',e:'mohy@example.com'},{n:'Office user 2',e:'user2@example.com'},{n:'Office user 3',e:'user3@example.com'}];
+const logs=[{t:'16-Nov-26 17:20',u:1,a:'Marked invoice as paid',r:'VF-0725'},{t:'16-Nov-26 16:40',u:0,a:'Changed quotation status from Draft to Sent',r:'VF-O&M20260902'},{t:'16-Nov-26 11:05',u:2,a:'Created quotation',r:'VF-O&M20260899'},{t:'15-Nov-26 14:30',u:0,a:'Exported invoices to Excel',r:'All invoices'},{t:'14-Nov-26 08:55',u:1,a:'Signed in',r:'-'}];
+function log(a,r){const d=new Date();logs.unshift({t:d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'}).replace(/ /g,'-')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),u:me,a,r})}
+function stSel(r){return `<select class="pill ${r.st}" onchange="setStatus('${r.no}',this.value)" aria-label="Status of ${r.no}">${['Draft','Sent','Approved','Rejected'].map(s=>`<option ${s===r.st?'selected':''}>${s}</option>`).join('')}</select>`}
+function setStatus(no,s){const q=quotes.find(x=>x.no===no),o=q.st;q.st=s;log('Changed quotation status from '+o+' to '+s,no);render();toast(s==='Approved'?'Approved. You can now convert it to an invoice.':'Status changed to '+s+'.',()=>{q.st=o;log('Undid status change on '+no+' (back to '+o+')',no);render()})}
+function setTheme(t){theme=t;if(t==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);log('Changed appearance to '+t,'Settings');render()}
+function chgPw(){const a=p0.value,b=p1.value,c=p2.value;if(!a)return toast('Enter your current password.');if(b.length<8)return toast('New password needs at least 8 characters.');if(b!==c)return toast('The new passwords do not match.');log('Changed own password','Settings');p0.value=p1.value=p2.value='';toast('Password updated.')}
+function resetFor(i){log('Sent password reset link to '+users[i].n,'Team accounts');toast('Reset link sent to '+users[i].e)}
+function signOut(){log('Signed out','-');lstep=0;page='login';render()}
+function signIn(){me=+document.getElementById('lu').value;log('Signed in','-');page='dash';render()}
+function sendReset(){toast('If that email has an account, a reset link is on its way.');lstep=0;render()}
+function loginPg(){return `<div style="max-width:380px;margin:8vh auto" class="card form"><div class="logo" style="color:var(--ink);padding-left:0"><b style="background:var(--brand);color:var(--brand-ink)">MSA</b><span>Quotes & Invoices</span></div>${lstep===0?`<label>User</label><select id="lu">${users.map((u,i)=>`<option value="${i}">${u.n}</option>`).join('')}</select><label>Password</label><input type="password" value="demo1234"><button class="btn" style="margin-top:14px;width:100%;text-align:center" onclick="signIn()">Sign in</button><p style="text-align:center;margin:12px 0 0"><button class="btn alt sm" onclick="lstep=1;render()">Forgot password?</button></p>`:`<h2>Reset your password</h2><p class="sub" style="font-size:14px">Enter your email and we’ll send a link to choose a new password.</p><label>Email</label><input type="email" placeholder="you@company.com"><button class="btn" style="margin-top:14px;width:100%;text-align:center" onclick="sendReset()">Send reset link</button><p style="text-align:center;margin:12px 0 0"><button class="btn alt sm" onclick="lstep=0;render()">Back to sign in</button></p>`}</div>`}
+function logsPg(){const rows=logs.filter(l=>lg==='All'||users[l.u].n===lg);return `<div class="top"><div><h1>Activity log</h1><p class="sub">See what each user did and when. Entries cannot be edited or deleted.</p></div><button class="btn alt" onclick="toast('Exported activity-log.csv')">Export CSV</button></div><div class="tools"><select onchange="lg=this.value;render()" aria-label="Filter by user"><option>All</option>${users.map(u=>`<option ${lg===u.n?'selected':''}>${u.n}</option>`).join('')}</select></div><div class="card wrap"><table><tr><th>Date and time</th><th>User</th><th>Action</th><th>Record</th></tr>${rows.map(l=>`<tr><td>${l.t}</td><td>${users[l.u].n}</td><td>${l.a}</td><td>${l.r}</td></tr>`).join('')}</table></div>`}
+function setPg(){return `<div class="top"><div><h1>Settings</h1><p class="sub">Signed in as ${users[me].n}. Manage your password and appearance.</p></div></div><div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"><div class="card form"><h2>Change password</h2><label>Current password</label><input type="password" id="p0" autocomplete="current-password"><label>New password</label><input type="password" id="p1" autocomplete="new-password"><label>Confirm new password</label><input type="password" id="p2" autocomplete="new-password"><p class="sub" style="font-size:13px;margin:8px 0">Use at least 8 characters.</p><button class="btn" onclick="chgPw()">Update password</button><p class="sub" style="font-size:13px;margin:14px 0 0">Forgot your password? Sign out and choose “Forgot password?” on the sign-in screen.</p><button class="btn alt sm" style="margin-top:8px" onclick="signOut()">Sign out and preview sign-in screen</button></div><div><div class="card form"><h2>Appearance</h2><div class="tools" style="margin:0">${['light','dark','system'].map(t=>`<button class="btn ${theme===t?'':'alt'}" onclick="setTheme('${t}')">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div></div><div class="card" style="margin-top:14px"><h2>Team accounts</h2><div class="wrap"><table>${users.map((u,i)=>`<tr><td><strong>${u.n}</strong><br><span class="sub" style="margin:0;font-size:12px">${u.e}</span></td><td class="r"><button class="btn alt sm" onclick="resetFor(${i})">Send reset link</button></td></tr>`).join('')}</table></div></div></div></div>`}
+function cust(){return `<div class="top"><div><h1>Customers</h1><p class="sub">Keep contact details and history for every client.</p></div><button class="btn" onclick="toast('Add customer form opens here')">Add customer</button></div>
+ <div class="card wrap"><table><tr><th>Customer</th><th>Contact</th><th class="r">Quotations</th><th class="r">Invoices</th><th>Actions</th></tr>${customers.map(c=>`<tr><td><strong>${c.n}</strong></td><td>${c.c}</td><td class="r">${c.q}</td><td class="r">${c.i}</td><td><button class="btn alt sm" onclick="ed.cu='${c.n}';go('edit')">New quotation</button></td></tr>`).join('')}</table></div>`}
+function sub(){return ed.items.reduce((a,b)=>a+b[1]*b[2],0)}
+function edit(){
+ const s=sub(),g=s*ed.gst/100;
+ return `<div class="top"><div><h1>New quotation</h1><p class="sub">Change the fields and watch the PDF update.</p></div>
+ <div class="tools"><button class="btn alt" onclick="toast('Saved as draft')">Save draft</button><button class="btn alt" onclick="toast('Downloading quotation.pdf')">Download PDF</button><button class="btn" onclick="sendQ()">Save & mark as sent</button></div></div>
+ <div class="editor"><div class="card form"><h2>Details</h2>
+ <label>Customer</label><select onchange="ed.cu=this.value;pv()">${customers.map(c=>`<option ${c.n===ed.cu?'selected':''}>${c.n}</option>`).join('')}</select>
+ <label>Site ID</label><input value="${ed.site}" oninput="ed.site=this.value;pv()">
+ <label>Title</label><input value="${ed.t}" oninput="ed.t=this.value;pv()">
+ <label>GST rate (%)</label><input type="number" min="0" max="100" value="${ed.gst}" oninput="ed.gst=+this.value||0;pv()">
+ <h2 style="margin-top:18px">Items</h2>
+ ${ed.items.map((it,i)=>`<label>Item ${i+1}</label><input value="${it[0].replace(/"/g,'&quot;')}" oninput="ed.items[${i}][0]=this.value;pv()"><div style="display:flex;gap:8px"><input type="number" min="1" value="${it[1]}" oninput="ed.items[${i}][1]=+this.value||0;pv()" aria-label="Quantity"><input type="number" min="0" value="${it[2]}" oninput="ed.items[${i}][2]=+this.value||0;pv()" aria-label="Unit price"></div>`).join('')}
+ <button class="btn alt sm" style="margin-top:10px" onclick="ed.items.push(['New item',1,0]);render()">Add item</button>
+ <h2 style="margin-top:18px">Template</h2><label class="chk"><input type="checkbox" ${ed.showSite?'checked':''} onchange="ed.showSite=this.checked;pv()"> Show Site ID column</label>
+ <p class="sub" style="font-size:13px;margin:6px 0 0">Logo, headings, payment details and column order are also editable in the full version.</p></div>
+ <div id="pv">${preview()}</div></div>`}
+function pv(){document.getElementById('pv').innerHTML=preview()}
+function preview(){const s=sub(),g=s*ed.gst/100,no=quotes.length?'VF-O&M20260903':'';
+ return `<div class="doc"><div class="hd"><div><div class="lg">MSA<small>TELECOMMUNICATION LTD</small></div><div style="margin-top:8px">PO Box 1839 Port Moresby, NCD<br>Papua New Guinea<br>msa.telecommunication2020@gmail.com</div></div>
+ <div class="meta"><strong>Quote No: ${no}</strong><br>Quote date: 16-Nov-26<br>Attention: ${ed.cu}</div></div>
+ <p style="margin:12px 0 0">We are pleased to submit our quotation for</p><h3>${ed.t}</h3>
+ <div class="wrap"><table><tr><th>SN</th>${ed.showSite?'<th>Site</th>':''}<th>Description</th><th>Qty</th><th>Unit price (PGK)</th><th>Total (PGK)</th></tr>
+ ${ed.items.map((it,i)=>`<tr><td>${i+1}</td>${ed.showSite?`<td>${ed.site}</td>`:''}<td>${it[0]}</td><td>${it[1]}</td><td>${it[2].toLocaleString('en-US',{minimumFractionDigits:2})}</td><td>${(it[1]*it[2]).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`).join('')}
+ <tr class="tot"><td colspan="${ed.showSite?5:4}" style="text-align:center">Total (GST exclusive)</td><td>${s.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>
+ <tr class="tot"><td colspan="${ed.showSite?5:4}" style="text-align:center">GST (${ed.gst}%)</td><td>${g.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>
+ <tr class="tot gr"><td colspan="${ed.showSite?5:4}" style="text-align:center">Total (GST inclusive)</td><td>${(s+g).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></table></div>
+ <div class="bank">Bank: BSP Bank, Waigani Banking Centre<br>Account name: MSA Telecommunication Ltd · Account no: 7022612985 · BSB: 088-202</div>
+ <div class="stamp">MSA<br>TELECOM</div></div>`}
+function sendQ(){quotes.unshift({no:'VF-O&M20260903',cu:ed.cu,site:ed.site,t:ed.t,d:'16-Nov-26',amt:sub()*(1+ed.gst/100),st:'Sent'});const nq=quotes[0];log('Created quotation and marked as Sent','VF-O&M20260903');f={q:'',s:'All'};go('quotes');toast('Quotation saved as VF-O&M20260903.',()=>{quotes.splice(quotes.indexOf(nq),1);log('Undid creation of quotation VF-O&M20260903','-');render()})}
+function render(){const lo=page==='login';document.querySelector('aside').style.display=lo?'none':'';document.querySelector('.app').style.display=lo?'block':'';nav();document.getElementById('who').innerHTML='Signed in as<br><strong style="color:#fff">'+users[me].n+'</strong><br><button class="btn alt sm" style="color:#fff;border-color:#4a5a92;margin-top:6px" onclick="signOut()">Sign out</button>';document.getElementById('main').innerHTML=page==='login'?loginPg():page==='logs'?logsPg():page==='set'?setPg():page==='dash'?dash():page==='quotes'?list('q'):page==='inv'?list('i'):page==='cust'?cust():edit()}
+document.querySelectorAll;render();
+</script>
+</body>
+</html>
